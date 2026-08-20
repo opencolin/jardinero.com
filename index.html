@@ -112,6 +112,16 @@
   .tint{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none}
   .tint-sunset{background:linear-gradient(180deg,rgba(255,190,120,0) 6%,rgba(255,168,100,.28) 55%,rgba(255,132,84,.5) 100%)}
   .tint-dusk{background:linear-gradient(180deg,rgba(36,56,98,.34) 0%,rgba(50,74,116,.3) 55%,rgba(26,46,82,.46) 100%)}
+  .flora{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+  .plant{position:absolute;bottom:-3px;width:clamp(96px,10vw,130px)}
+  .plant svg{width:100%;height:auto}
+  .plant-l{left:max(10px,1.2vw)}
+  .plant-r{right:max(10px,1.2vw);transform:scaleX(-1)}
+  .plant .st{stroke:#265c2e;stroke-width:3.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+  .plant .leaf{fill:#468c3f;stroke:#2c6631;stroke-width:1.3}
+  .plant .pop,.plant .leaf{transform-box:fill-box;transform-origin:50% 100%}
+  .grass path{vector-effect:non-scaling-stroke}
+  @media (max-width:1023px){.flora{display:none}}
 
   @media (prefers-reduced-motion: no-preference){
     .sun{animation:sun-cycle 40s linear infinite}
@@ -171,6 +181,26 @@
       97%{opacity:.18}
       100%{opacity:.14}
     }
+
+    .plant .sa{animation:stem-a 40s linear infinite}
+    .plant .sb{animation:stem-b 40s linear infinite}
+    .plant .sc{animation:stem-c 40s linear infinite}
+    .plant .lp1{animation:pop-1 40s linear infinite}
+    .plant .lp2{animation:pop-2 40s linear infinite}
+    .plant .lp3{animation:pop-3 40s linear infinite}
+    .plant .lp4{animation:pop-4 40s linear infinite}
+    .plant-l .leaf{animation:helio-l 40s linear infinite}
+    .plant-r .leaf{animation:helio-r 40s linear infinite}
+
+    @keyframes stem-a{0%,4%{stroke-dashoffset:1}14%,59%{stroke-dashoffset:0}67%,100%{stroke-dashoffset:1}}
+    @keyframes stem-b{0%,12%{stroke-dashoffset:1}20%,58%{stroke-dashoffset:0}65%,100%{stroke-dashoffset:1}}
+    @keyframes stem-c{0%,16%{stroke-dashoffset:1}24%,57%{stroke-dashoffset:0}64%,100%{stroke-dashoffset:1}}
+    @keyframes pop-1{0%,14%{transform:scale(.001)}17%{transform:scale(1.12)}19%,60%{transform:scale(1)}64%,100%{transform:scale(.001)}}
+    @keyframes pop-2{0%,18%{transform:scale(.001)}21%{transform:scale(1.12)}23%,59%{transform:scale(1)}63%,100%{transform:scale(.001)}}
+    @keyframes pop-3{0%,22%{transform:scale(.001)}25%{transform:scale(1.12)}27%,58%{transform:scale(1)}62%,100%{transform:scale(.001)}}
+    @keyframes pop-4{0%,26%{transform:scale(.001)}29%{transform:scale(1.12)}31%,57%{transform:scale(1)}61%,100%{transform:scale(.001)}}
+    @keyframes helio-l{0%,10%{transform:rotate(-16deg)}31%{transform:rotate(0deg)}52%,60%{transform:rotate(20deg)}80%{transform:rotate(0deg)}100%{transform:rotate(-16deg)}}
+    @keyframes helio-r{0%,10%{transform:rotate(16deg)}31%{transform:rotate(0deg)}52%,60%{transform:rotate(-20deg)}80%{transform:rotate(0deg)}100%{transform:rotate(16deg)}}
   }
 
   /* ---------- product shot ---------- */
@@ -439,9 +469,59 @@
         <linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#67a854"/><stop offset="1" stop-color="#4d8f44"/></linearGradient>
       </defs>
       <path fill="url(#h1)" d="M0,190 C220,140 460,128 720,160 C980,192 1220,150 1440,118 L1440,320 L0,320 Z"/>
+      <g class="grass" stroke="#86ba68" stroke-width="2.2" stroke-linecap="round" fill="none">
+        <path d="M86,170 Q84,163 81,160 M90,170 Q89.5,161 89,158 M94,170 Q96,164 98,161"/>
+        <path d="M246,144 Q244,137 241,134 M250,144 Q249.5,135 249,132 M254,144 Q256,138 258,135"/>
+        <path d="M426,131 Q424,123 421,120 M430,131 Q429.5,122 429,118 M434,131 Q436,125 438,122"/>
+        <path d="M606,142 Q604,135 601,132 M610,142 Q609.5,133 609,130 M614,142 Q616,136 618,133"/>
+        <path d="M826,170 Q824,163 821,160 M830,170 Q829.5,161 829,158 M834,170 Q836,164 838,161"/>
+        <path d="M1006,173 Q1004,166 1001,163 M1010,173 Q1009.5,164 1009,161 M1014,173 Q1016,167 1018,164"/>
+        <path d="M1186,156 Q1184,149 1181,146 M1190,156 Q1189.5,147 1189,144 M1194,156 Q1196,150 1198,147"/>
+        <path d="M1356,130 Q1354,122 1351,119 M1360,130 Q1359.5,121 1359,117 M1364,130 Q1366,124 1368,121"/>
+      </g>
       <path fill="url(#h2)" d="M0,240 C260,196 520,190 780,218 C1040,246 1250,214 1440,190 L1440,320 L0,320 Z"/>
+      <g class="grass" stroke="#5f9c4e" stroke-width="2.4" stroke-linecap="round" fill="none">
+        <path d="M155,219 Q153,211 150,207 M160,219 Q159.5,208 159,204 M165,219 Q167,212 170,208"/>
+        <path d="M415,203 Q413,195 410,191 M420,203 Q419.5,192 419,188 M425,203 Q427,196 430,192"/>
+        <path d="M695,212 Q693,204 690,200 M700,212 Q699.5,201 699,197 M705,212 Q707,205 710,201"/>
+        <path d="M975,230 Q973,222 970,218 M980,230 Q979.5,219 979,215 M985,230 Q987,223 990,219"/>
+        <path d="M1285,209 Q1283,201 1280,197 M1290,209 Q1289.5,198 1289,194 M1295,209 Q1297,202 1300,198"/>
+      </g>
       <path fill="url(#h3)" d="M0,288 C300,254 580,250 860,270 C1140,290 1310,272 1440,254 L1440,320 L0,320 Z"/>
+      <g class="grass" stroke="#47823f" stroke-width="2.6" stroke-linecap="round" fill="none">
+        <path d="M234,268 Q232,259 228,254 M240,268 Q239.5,255 239,251 M246,268 Q248,260 252,255"/>
+        <path d="M554,258 Q552,249 548,244 M560,258 Q559.5,245 559,241 M566,258 Q568,250 572,245"/>
+        <path d="M934,274 Q932,265 928,260 M940,274 Q939.5,261 939,257 M946,274 Q948,266 952,261"/>
+        <path d="M1234,273 Q1232,264 1228,259 M1240,273 Q1239.5,260 1239,256 M1246,273 Q1248,265 1252,260"/>
+      </g>
     </svg>
+
+    <div class="flora" aria-hidden="true">
+      <div class="plant plant-l">
+        <svg viewBox="0 0 130 210" fill="none">
+          <path class="st sa" pathLength="1" d="M28,210 C26,168 36,130 48,98 C54,82 56,72 55,62"/>
+          <path class="st sb" pathLength="1" d="M33,172 C24,158 16,146 13,128"/>
+          <path class="st sc" pathLength="1" d="M42,124 C56,116 68,110 80,102"/>
+          <g transform="translate(24,193) rotate(38) scale(.62)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(37,148) rotate(-26) scale(.72)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(13,128) rotate(-38) scale(.8)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(80,102) rotate(42) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(55,62) rotate(2) scale(.95)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        </svg>
+      </div>
+      <div class="plant plant-r">
+        <svg viewBox="0 0 130 210" fill="none">
+          <path class="st sa" pathLength="1" d="M28,210 C26,168 36,130 48,98 C54,82 56,72 55,62"/>
+          <path class="st sb" pathLength="1" d="M33,172 C24,158 16,146 13,128"/>
+          <path class="st sc" pathLength="1" d="M42,124 C56,116 68,110 80,102"/>
+          <g transform="translate(24,193) rotate(38) scale(.62)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(37,148) rotate(-26) scale(.72)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(13,128) rotate(-38) scale(.8)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(80,102) rotate(42) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(55,62) rotate(2) scale(.95)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        </svg>
+      </div>
+    </div>
   </section>
 
   <section class="showcase" aria-label="Product overview">
