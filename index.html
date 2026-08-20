@@ -112,14 +112,44 @@
   .tint{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none}
   .tint-sunset{background:linear-gradient(180deg,rgba(255,190,120,0) 6%,rgba(255,168,100,.28) 55%,rgba(255,132,84,.5) 100%)}
   .tint-dusk{background:linear-gradient(180deg,rgba(24,42,82,.44) 0%,rgba(30,52,92,.52) 50%,rgba(14,30,60,.66) 100%)}
-  .flora{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+  .flora{position:absolute;inset:0;z-index:60;pointer-events:none;overflow:visible}
   .plant{position:absolute;bottom:-3px;width:clamp(300px,46vw,920px)}
   .plant svg{width:100%;height:auto}
   .plant-l{left:max(-140px,-7vw)}
   .plant-r{right:max(-140px,-7vw);transform:scaleX(-1)}
-  .plant .st{stroke:#265c2e;stroke-width:3.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
-  .plant .leaf{fill:#468c3f;stroke:#2c6631;stroke-width:1.3}
-  .plant .pop,.plant .leaf{transform-box:fill-box;transform-origin:50% 100%}
+  .st{stroke:#265c2e;stroke-width:3.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+  .leaf{fill:#468c3f;stroke:#2c6631;stroke-width:1.3}
+  .pop,.leaf,.head{transform-box:fill-box;transform-origin:50% 100%}
+  .field{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+  .sunflower{position:absolute}
+  .sunflower svg{width:100%;height:auto}
+  .sunflower .st{stroke-width:3}
+  .sf1{left:15%;bottom:calc(var(--hills-h)*.30);width:54px}
+  .sf2{left:30%;bottom:calc(var(--hills-h)*.10);width:76px}
+  .sf3{right:29%;bottom:calc(var(--hills-h)*.16);width:66px}
+  .sf4{right:13%;bottom:calc(var(--hills-h)*.36);width:48px}
+  .petal{fill:#f4c445;stroke:#d9a32e;stroke-width:1}
+  .bfly{position:absolute;left:0;bottom:calc(var(--hills-h)*.55);width:26px;opacity:0}
+  .bfly.b2{bottom:calc(var(--hills-h)*.25);width:19px}
+  .cloud,.cloud::before,.cloud::after{background:rgba(255,255,255,.78);border-radius:999px}
+  .cloud{position:absolute;left:-30vw}
+  .cloud::before,.cloud::after{content:"";position:absolute}
+  .c1{top:11%;width:170px;height:34px}
+  .c1::before{width:64px;height:64px;left:26px;top:-30px}
+  .c1::after{width:46px;height:46px;right:30px;top:-20px}
+  .c2{top:21%;width:120px;height:26px;opacity:.75}
+  .c2::before{width:44px;height:44px;left:20px;top:-20px}
+  .c2::after{width:34px;height:34px;right:22px;top:-15px}
+  .c3{top:5%;width:210px;height:40px;opacity:.6}
+  .c3::before{width:74px;height:74px;left:36px;top:-34px}
+  .c3::after{width:54px;height:54px;right:38px;top:-24px}
+  .fireflies{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .ff{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe28a;box-shadow:0 0 10px 3px rgba(255,214,110,.7);opacity:0}
+  .f1{left:12%;bottom:calc(var(--hills-h)*.55)}
+  .f2{left:26%;bottom:calc(var(--hills-h)*.30)}
+  .f3{left:44%;bottom:calc(var(--hills-h)*.62)}
+  .f4{right:24%;bottom:calc(var(--hills-h)*.38)}
+  .f5{right:10%;bottom:calc(var(--hills-h)*.58)}
   .grass path{vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:50% 100%;transition:opacity .5s ease}
   .grass path.trampled{opacity:0!important;transition-duration:.15s}
   @media (max-width:1023px){.flora{display:none}}
@@ -183,15 +213,43 @@
       100%{opacity:.16}
     }
 
-    .plant .sa{animation:stem-a 40s linear infinite}
-    .plant .sb{animation:stem-b 40s linear infinite}
-    .plant .sc{animation:stem-c 40s linear infinite}
-    .plant .lp1{animation:pop-1 40s linear infinite}
-    .plant .lp2{animation:pop-2 40s linear infinite}
-    .plant .lp3{animation:pop-3 40s linear infinite}
-    .plant .lp4{animation:pop-4 40s linear infinite}
-    .plant-l .leaf{animation:helio-l 40s linear infinite}
+    .sa{animation:stem-a 40s linear infinite}
+    .sb{animation:stem-b 40s linear infinite}
+    .sc{animation:stem-c 40s linear infinite}
+    .lp1{animation:pop-1 40s linear infinite}
+    .lp2{animation:pop-2 40s linear infinite}
+    .lp3{animation:pop-3 40s linear infinite}
+    .lp4{animation:pop-4 40s linear infinite}
+    .plant-l .leaf,.sunflower .leaf{animation:helio-l 40s linear infinite}
     .plant-r .leaf{animation:helio-r 40s linear infinite}
+    .head{animation:helio-head 40s linear infinite}
+    .grass{transform-box:fill-box;transform-origin:50% 100%;animation:field-sway 5.6s ease-in-out infinite alternate}
+    .grass:nth-of-type(2){animation-duration:6.4s;animation-delay:-2s}
+    .grass:nth-of-type(3){animation-duration:4.9s;animation-delay:-1s}
+    .plant svg,.sunflower svg{transform-origin:50% 100%;animation:plant-sway 6.1s ease-in-out infinite alternate}
+    .plant-r svg{animation-duration:5.3s;animation-delay:-1.4s}
+    .sunflower svg{animation-duration:4.6s}
+    .sunflower:nth-of-type(even) svg{animation-delay:-2.2s}
+    .cloud{animation:cloud-drift 160s linear infinite;animation-delay:-40s}
+    .c2{animation-duration:120s;animation-delay:-70s}
+    .c3{animation-duration:200s;animation-delay:-15s}
+    .fl{transform-box:fill-box;transform-origin:100% 50%;animation:flap .42s ease-in-out infinite alternate}
+    .fr{transform-box:fill-box;transform-origin:0% 50%;animation:flap .42s ease-in-out infinite alternate}
+    .b1{animation:fly-1 40s linear infinite}
+    .b2{animation:fly-2 40s linear infinite}
+    .f1,.f4{animation:firefly-a 40s linear infinite}
+    .f2,.f5{animation:firefly-b 40s linear infinite}
+    .f3{animation:firefly-c 40s linear infinite}
+    @keyframes field-sway{from{transform:skewX(-.7deg)}to{transform:skewX(.7deg)}}
+    @keyframes plant-sway{from{transform:skewX(-.6deg)}to{transform:skewX(.6deg)}}
+    @keyframes helio-head{0%,8%{transform:rotate(-26deg)}31%{transform:rotate(0deg)}54%,62%{transform:rotate(24deg)}80%{transform:rotate(0deg)}100%{transform:rotate(-26deg)}}
+    @keyframes cloud-drift{from{transform:translateX(0)}to{transform:translateX(165vw)}}
+    @keyframes flap{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+    @keyframes fly-1{0%,9%{transform:translate(6vw,0);opacity:0}12%{transform:translate(10vw,-40px);opacity:1}20%{transform:translate(22vw,-95px)}28%{transform:translate(34vw,-35px)}36%{transform:translate(47vw,-115px)}44%{transform:translate(59vw,-55px)}52%{transform:translate(71vw,-125px)}58%{transform:translate(81vw,-70px)}62%{transform:translate(88vw,-105px);opacity:1}65%,100%{transform:translate(92vw,-130px);opacity:0}}
+    @keyframes fly-2{0%,15%{transform:translate(90vw,-20px);opacity:0}18%{transform:translate(86vw,-70px);opacity:1}26%{transform:translate(74vw,-25px)}34%{transform:translate(62vw,-100px)}42%{transform:translate(50vw,-45px)}50%{transform:translate(38vw,-110px)}56%{transform:translate(27vw,-60px)}60%{transform:translate(18vw,-95px);opacity:1}63%,100%{transform:translate(12vw,-120px);opacity:0}}
+    @keyframes firefly-a{0%,66%{opacity:0;transform:translate(0,0)}69%{opacity:.95}72%{opacity:.15;transform:translate(6px,-8px)}76%{opacity:1}80%{opacity:.2;transform:translate(-4px,-14px)}84%{opacity:.9}88%{opacity:.25;transform:translate(5px,-20px)}92%{opacity:.8}95%,100%{opacity:0;transform:translate(2px,-26px)}}
+    @keyframes firefly-b{0%,68%{opacity:0;transform:translate(0,0)}71%{opacity:.9}75%{opacity:.1;transform:translate(-6px,-6px)}79%{opacity:1}83%{opacity:.15;transform:translate(4px,-12px)}87%{opacity:.85}91%{opacity:.2;transform:translate(-5px,-18px)}94%,100%{opacity:0}}
+    @keyframes firefly-c{0%,70%{opacity:0}73%{opacity:1}77%{opacity:.2;transform:translate(5px,-10px)}82%{opacity:.9}86%{opacity:.15;transform:translate(-6px,-16px)}90%{opacity:.75}93%,100%{opacity:0}}
 
     @keyframes stem-a{0%,4%{stroke-dashoffset:1.02;opacity:0}4.5%{stroke-dashoffset:.95;opacity:1}14%,59%{stroke-dashoffset:0;opacity:1}66%{stroke-dashoffset:.95;opacity:1}67%,100%{stroke-dashoffset:1.02;opacity:0}}
     @keyframes stem-b{0%,12%{stroke-dashoffset:1.02;opacity:0}12.5%{stroke-dashoffset:.95;opacity:1}20%,58%{stroke-dashoffset:0;opacity:1}64.5%{stroke-dashoffset:.95;opacity:1}65.5%,100%{stroke-dashoffset:1.02;opacity:0}}
@@ -412,6 +470,7 @@
     .hero{--hills-h:150px}
     .hills .grass path{animation:none}
     .hills .grass .d2{display:none}
+    .bfly,.sunflower{display:none}
     .nav-links{display:none}
     .eyebrow{font-size:10px;letter-spacing:.1em;padding:6px 12px}
     .shot-tabs{display:none}
@@ -487,9 +546,13 @@
       <div class="sun"></div>
       <div class="moon"></div>
       <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span>
+      <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     </div>
     <div class="tint tint-sunset" aria-hidden="true"></div>
     <div class="tint tint-dusk" aria-hidden="true"></div>
+    <div class="fireflies" aria-hidden="true">
+      <i class="ff f1"></i><i class="ff f2"></i><i class="ff f3"></i><i class="ff f4"></i><i class="ff f5"></i>
+    </div>
     <div class="hero-inner">
       <span class="eyebrow"><span class="dot"></span>Open source &middot; from the team at Tenki</span>
       <h1>Tends your codebase<br>while you&rsquo;re away.</h1>
@@ -2217,17 +2280,76 @@
       </g>
     </svg>
 
+    <div class="field" aria-hidden="true">
+      <div class="sunflower sf1"><svg viewBox="0 0 60 150" fill="none">
+        <path class="st sa" pathLength="1" d="M30,150 C29,118 31,92 30,64"/>
+        <g transform="translate(30,114) rotate(-32) scale(.5)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,96) rotate(30) scale(.45)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,58)"><g class="pop lp3"><g class="head">
+          <ellipse class="petal" transform="rotate(0)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(30)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(60)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(90)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(120)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(150)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(180)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(210)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(240)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(270)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(300)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(330)" cy="-13" rx="4.6" ry="11"/>
+          <circle r="7.5" fill="#7a4f2a" stroke="#5d3b1e" stroke-width="1.5"/>
+        </g></g></g>
+      </svg></div>
+      <div class="sunflower sf2"><svg viewBox="0 0 60 150" fill="none">
+        <path class="st sa" pathLength="1" d="M30,150 C29,118 31,92 30,64"/>
+        <g transform="translate(30,114) rotate(-32) scale(.5)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,96) rotate(30) scale(.45)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,58)"><g class="pop lp3"><g class="head">
+          <ellipse class="petal" transform="rotate(0)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(30)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(60)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(90)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(120)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(150)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(180)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(210)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(240)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(270)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(300)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(330)" cy="-13" rx="4.6" ry="11"/>
+          <circle r="7.5" fill="#7a4f2a" stroke="#5d3b1e" stroke-width="1.5"/>
+        </g></g></g>
+      </svg></div>
+      <div class="sunflower sf3"><svg viewBox="0 0 60 150" fill="none">
+        <path class="st sa" pathLength="1" d="M30,150 C29,118 31,92 30,64"/>
+        <g transform="translate(30,114) rotate(-32) scale(.5)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,96) rotate(30) scale(.45)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,58)"><g class="pop lp3"><g class="head">
+          <ellipse class="petal" transform="rotate(0)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(30)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(60)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(90)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(120)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(150)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(180)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(210)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(240)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(270)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(300)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(330)" cy="-13" rx="4.6" ry="11"/>
+          <circle r="7.5" fill="#7a4f2a" stroke="#5d3b1e" stroke-width="1.5"/>
+        </g></g></g>
+      </svg></div>
+      <div class="sunflower sf4"><svg viewBox="0 0 60 150" fill="none">
+        <path class="st sa" pathLength="1" d="M30,150 C29,118 31,92 30,64"/>
+        <g transform="translate(30,114) rotate(-32) scale(.5)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,96) rotate(30) scale(.45)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+        <g transform="translate(30,58)"><g class="pop lp3"><g class="head">
+          <ellipse class="petal" transform="rotate(0)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(30)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(60)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(90)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(120)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(150)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(180)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(210)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(240)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(270)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(300)" cy="-13" rx="4.6" ry="11"/><ellipse class="petal" transform="rotate(330)" cy="-13" rx="4.6" ry="11"/>
+          <circle r="7.5" fill="#7a4f2a" stroke="#5d3b1e" stroke-width="1.5"/>
+        </g></g></g>
+      </svg></div>
+      <div class="bfly b1"><svg viewBox="0 0 22 16" fill="none">
+        <g class="fl"><path d="M10,8 C4,1 -1,3 1,9 C2,13 7,12 10,8 Z" fill="#eda23e" stroke="#b8762a" stroke-width="1"/></g>
+        <g class="fr"><path d="M12,8 C18,1 23,3 21,9 C20,13 15,12 12,8 Z" fill="#eda23e" stroke="#b8762a" stroke-width="1"/></g>
+        <ellipse cx="11" cy="8.6" rx="1.4" ry="4" fill="#4c3a22"/>
+      </svg></div>
+      <div class="bfly b2"><svg viewBox="0 0 22 16" fill="none">
+        <g class="fl"><path d="M10,8 C4,1 -1,3 1,9 C2,13 7,12 10,8 Z" fill="#e8b7c9" stroke="#b57e94" stroke-width="1"/></g>
+        <g class="fr"><path d="M12,8 C18,1 23,3 21,9 C20,13 15,12 12,8 Z" fill="#e8b7c9" stroke="#b57e94" stroke-width="1"/></g>
+        <ellipse cx="11" cy="8.6" rx="1.4" ry="4" fill="#4c3a22"/>
+      </svg></div>
+    </div>
+
     <div class="flora" aria-hidden="true">
       <div class="plant plant-l">
         <svg viewBox="0 0 130 210" fill="none">
           <path class="st sa" pathLength="1" d="M28,210 C26,168 36,130 48,98 C54,82 56,72 55,62"/>
           <path class="st sb" pathLength="1" d="M33,172 C24,158 16,146 13,128"/>
           <path class="st sc" pathLength="1" d="M42,124 C56,116 68,110 80,102"/>
+          <path class="st sb" pathLength="1" d="M36,190 C48,182 58,176 66,168"/>
+          <path class="st sc" pathLength="1" d="M50,96 C40,86 32,78 28,66"/>
+          <path class="st sc" pathLength="1" d="M44,112 C36,104 30,100 24,92"/>
           <g transform="translate(24,193) rotate(38) scale(.62)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(37,148) rotate(-26) scale(.72)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(33,172) rotate(-52) scale(.6)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(13,128) rotate(-38) scale(.8)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(22,150) rotate(-34) scale(.55)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(66,168) rotate(48) scale(.7)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(80,102) rotate(42) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(28,66) rotate(-30) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(24,92) rotate(-42) scale(.65)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(55,62) rotate(2) scale(.95)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(60,84) rotate(24) scale(.68)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(48,98) rotate(-14) scale(.6)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
         </svg>
       </div>
       <div class="plant plant-r">
@@ -2235,11 +2357,21 @@
           <path class="st sa" pathLength="1" d="M28,210 C26,168 36,130 48,98 C54,82 56,72 55,62"/>
           <path class="st sb" pathLength="1" d="M33,172 C24,158 16,146 13,128"/>
           <path class="st sc" pathLength="1" d="M42,124 C56,116 68,110 80,102"/>
+          <path class="st sb" pathLength="1" d="M36,190 C48,182 58,176 66,168"/>
+          <path class="st sc" pathLength="1" d="M50,96 C40,86 32,78 28,66"/>
+          <path class="st sc" pathLength="1" d="M44,112 C36,104 30,100 24,92"/>
           <g transform="translate(24,193) rotate(38) scale(.62)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(37,148) rotate(-26) scale(.72)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(33,172) rotate(-52) scale(.6)"><g class="pop lp1"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(13,128) rotate(-38) scale(.8)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(22,150) rotate(-34) scale(.55)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(66,168) rotate(48) scale(.7)"><g class="pop lp2"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(80,102) rotate(42) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(28,66) rotate(-30) scale(.8)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(24,92) rotate(-42) scale(.65)"><g class="pop lp3"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
           <g transform="translate(55,62) rotate(2) scale(.95)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(60,84) rotate(24) scale(.68)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
+          <g transform="translate(48,98) rotate(-14) scale(.6)"><g class="pop lp4"><path class="leaf" d="M0,0 C-9,-12 -9,-26 0,-34 C9,-26 9,-12 0,0 Z"/></g></g>
         </svg>
       </div>
     </div>
