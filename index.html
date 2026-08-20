@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jardinero — tends your codebase while you're away</title>
+<meta name="description" content="Jardinero is an open-source, always-on AI engineer. It watches your logs, fixes what breaks in disposable sandboxes, takes Linear issues to done, and keeps every PR moving toward merge. From the team at Tenki.">
+<meta property="og:title" content="Jardinero — tends your codebase while you're away">
+<meta property="og:description" content="An open-source, always-on AI engineer. It watches your logs, fixes bugs in disposable sandboxes, implements Linear issues, and keeps PRs moving — 24/7.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f9f3; --card:#ffffff; --ink:#131f16; --muted:#57695c; --faint:#8b9a8e;
+    --line:#e2eadf; --line-soft:#ecf2e9;
+    --blue:#2f63f0; --blue-deep:#2149c9; --blue-soft:#e9efff; --blue-ink:#2f63f0;
+    --green:#2e7d44; --green-soft:#e6f2e7; --green-deep:#1d5730;
+    --sky:#e3f1fb;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --shadow-lg:0 30px 70px -18px rgba(19,45,26,.28), 0 8px 24px -12px rgba(19,45,26,.18);
+    --shadow-sm:0 2px 10px rgba(19,45,26,.06);
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{
+    font-family:var(--sans); background:var(--bg); color:var(--ink);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    font-size:16px; line-height:1.6; overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  img,svg{display:block;max-width:100%}
+  .container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  .mark{flex:none}
+
+  /* ---------- nav ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(19,45,26,.07);
+  }
+  .nav-inner{display:flex;align-items:center;gap:28px;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+  .nav-links{display:flex;gap:26px;margin-left:auto;font-size:14.5px;font-weight:500;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;
+    padding:11px 20px;border-radius:12px;transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 6px 18px -6px rgba(47,99,240,.55)}
+  .btn-primary:hover{background:var(--blue-deep)}
+  .btn-ghost{border:1px solid var(--line);background:var(--card);color:var(--ink);box-shadow:var(--shadow-sm)}
+  .btn-ghost:hover{border-color:#cdd9ca}
+  .btn-green{background:var(--green);color:#fff;box-shadow:0 6px 18px -6px rgba(46,125,68,.5)}
+  .btn-green:hover{background:var(--green-deep)}
+  .nav .btn{padding:8px 15px;font-size:13.5px;border-radius:10px}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;background:linear-gradient(180deg,var(--sky) 0%,#eef6ee 62%,#e9f3e6 100%)}
+  .hero-inner{padding:92px 24px 36px;max-width:880px;margin:0 auto;text-align:center;position:relative;z-index:2}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--green-deep);background:rgba(255,255,255,.7);border:1px solid rgba(46,125,68,.25);
+    padding:7px 14px;border-radius:999px;margin-bottom:26px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+  h1{
+    font-size:clamp(2.5rem,6.4vw,4.35rem);line-height:1.04;letter-spacing:-.035em;font-weight:800;
+    margin-bottom:22px;
+  }
+  .hero p.lede{font-size:clamp(1.02rem,2vw,1.2rem);color:var(--muted);max-width:660px;margin:0 auto 18px}
+  .pron{
+    display:inline-block;font-family:var(--mono);font-size:12.5px;color:var(--faint);
+    margin-bottom:30px;letter-spacing:.02em;
+  }
+  .hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  .hills{display:block;width:100%;height:clamp(150px,24vw,320px);margin-top:-40px}
+
+  /* ---------- product shot ---------- */
+  .showcase{position:relative;z-index:3;margin-top:clamp(-120px,-16vw,-230px);padding-bottom:20px}
+  .shot{
+    max-width:960px;margin:0 auto;background:var(--card);border:1px solid var(--line);
+    border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;
+    font-size:13px;line-height:1.45;
+  }
+  .shot-nav{
+    display:flex;align-items:center;gap:18px;padding:12px 18px;border-bottom:1px solid var(--line-soft);
+    background:#fff;
+  }
+  .shot-brand{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;letter-spacing:-.01em}
+  .shot-tabs{display:flex;gap:4px;margin:0 auto;flex-wrap:nowrap}
+  .shot-tabs span{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+  .shot-tabs .active{background:var(--blue);color:#fff;font-weight:600}
+  .live{
+    display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:var(--green-deep);
+    background:var(--green-soft);border:1px solid rgba(46,125,68,.22);padding:5px 11px;border-radius:999px;
+  }
+  .live i{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+  @media (prefers-reduced-motion: no-preference){
+    .live i{animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  }
+  .shot-body{padding:20px 22px 22px;background:#fbfdfa}
+  .shot-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px}
+  .shot-head h3{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+  .shot-head time{font-size:11.5px;color:var(--faint)}
+  .shot-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .stat .lab{font-size:11px;font-weight:500;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .stat .num{font-size:23px;font-weight:700;letter-spacing:-.02em;margin-top:5px}
+  .stat.blue{background:linear-gradient(140deg,#3a71ff,#2653e0);border-color:transparent;color:#fff}
+  .stat.blue .lab{color:rgba(255,255,255,.85)}
+  .sect-lab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .wf{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+  .wf-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 12px;min-width:0}
+  .wf-card b{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;font-weight:650;letter-spacing:-.01em}
+  .wf-card b em{font-style:normal;font-family:var(--mono);font-weight:500;font-size:10px;color:var(--faint)}
+  .wf-card .st{font-size:10.5px;color:var(--faint);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip{
+    display:inline-block;font-size:10px;font-weight:600;color:var(--blue-ink);background:var(--blue-soft);
+    border-radius:6px;padding:2px 7px;margin-top:5px;white-space:nowrap;
+  }
+  .rows{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:20px}
+  .row{
+    display:grid;grid-template-columns:1.5fr 1fr auto auto;gap:14px;align-items:center;
+    padding:10px 14px;border-top:1px solid var(--line-soft);
+  }
+  .row:first-child{border-top:0}
+  .row .ref{font-family:var(--mono);font-size:11.5px;color:var(--blue-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .wfn{font-size:11.5px;color:var(--muted)}
+  .row .chip{margin-top:0}
+  .row time{font-family:var(--mono);font-size:10.5px;color:var(--faint);white-space:nowrap}
+  .out{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .out div{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 14px}
+  .out .lab{font-size:10.5px;color:var(--muted)}
+  .out .num{font-size:17px;font-weight:700;margin-top:2px}
+  .shot-cap{text-align:center;color:var(--muted);font-size:14.5px;max-width:620px;margin:22px auto 0}
+  .machines{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .machines span{
+    font-family:var(--mono);font-size:12px;color:var(--muted);background:#fff;
+    border:1px solid var(--line);border-radius:8px;padding:5px 11px;
+  }
+
+  /* ---------- overnight feed ---------- */
+  .feed{max-width:640px;margin:44px auto 0;display:flex;flex-direction:column;gap:12px}
+  .msg{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-sm)}
+  .msg-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .msg-head .av{
+    width:30px;height:30px;border-radius:9px;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .msg-head b{font-size:14px;font-weight:700}
+  .badge-app{font-size:9.5px;font-weight:700;letter-spacing:.05em;background:var(--blue);color:#fff;border-radius:4px;padding:2px 5px}
+  .msg-head time{font-size:11px;color:var(--faint);margin-left:auto;font-family:var(--mono)}
+  .msg .body{font-size:13.8px;color:var(--muted);line-height:1.55}
+  .msg .body b{color:var(--ink);font-weight:650}
+  .msg-meta{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+  .msg-meta span{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-radius:6px;padding:2.5px 8px;color:var(--muted)}
+  .msg-meta .ok{color:var(--green-deep);background:var(--green-soft);border-color:transparent}
+  .msg-meta .warn{color:#9a5b00;background:#fdf1dd;border-color:transparent}
+  .msg.attn{border-color:#eed9a9;background:#fffdf6}
+  .feed-cap{text-align:center;color:var(--faint);font-size:13.5px;max-width:560px;margin:20px auto 0}
+
+  /* ---------- sections ---------- */
+  section.block{padding:96px 0}
+  .sec-eyebrow{
+    font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--green);margin-bottom:14px;
+  }
+  h2{font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-.03em;line-height:1.12;font-weight:750;margin-bottom:16px}
+  .sec-lede{color:var(--muted);font-size:17px;max-width:640px}
+  .center{text-align:center}
+  .center .sec-lede{margin:0 auto}
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;
+    box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px;
+  }
+  .card .ico{
+    width:42px;height:42px;border-radius:11px;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .card h3{font-size:18.5px;font-weight:700;letter-spacing:-.015em}
+  .card p{font-size:14.8px;color:var(--muted)}
+  .card .tag{margin-top:auto;padding-top:6px}
+  .card .tag span{
+    font-family:var(--mono);font-size:11px;color:var(--green-deep);background:var(--green-soft);
+    border-radius:7px;padding:3px 9px;margin-right:6px;display:inline-block;margin-top:4px;
+  }
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:44px}
+  .step .n{
+    font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);
+    border-bottom:2px solid var(--green);display:inline-block;padding-bottom:6px;margin-bottom:14px;
+  }
+  .step h3{font-size:17.5px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+  .step p{font-size:14.8px;color:var(--muted)}
+
+  .split{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center;margin-top:8px}
+  .checks{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:14px}
+  .checks li{display:flex;gap:12px;font-size:15.5px;color:var(--ink)}
+  .checks li small{display:block;color:var(--muted);font-size:14px}
+  .checks .ck{
+    flex:none;width:22px;height:22px;border-radius:7px;background:var(--green-soft);color:var(--green-deep);
+    display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .repo{
+    background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);
+    padding:26px;
+  }
+  .repo-top{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px}
+  .repo-top b{font-weight:600}
+  .repo p{color:var(--muted);font-size:14.5px;margin:12px 0 18px}
+  .repo-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .repo-meta span{
+    font-family:var(--mono);font-size:11.5px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:4px 11px;
+  }
+  .repo .btn{width:100%;justify-content:center}
+
+  .tenki{background:linear-gradient(180deg,#eaf4e8,#e2efdf);border-top:1px solid #dbe8d6;border-bottom:1px solid #dbe8d6}
+  .tenki .sec-lede{font-size:17.5px}
+  .tenki-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+
+  .final{padding:120px 0 110px;text-align:center}
+  .final h2{font-size:clamp(2rem,4.6vw,3.1rem)}
+  .final p{color:var(--muted);font-size:17px;margin-bottom:32px}
+
+  footer{border-top:1px solid var(--line);background:#fff}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:34px 0;flex-wrap:wrap}
+  .foot .brand{font-size:16px}
+  .foot-note{color:var(--faint);font-size:13.5px}
+  .foot-links{display:flex;gap:22px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+  .foot-links a:hover{color:var(--ink)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:920px){
+    .wf{grid-template-columns:repeat(3,1fr)}
+    .wf-card:nth-child(n+4){display:none}
+    .cards,.steps{grid-template-columns:1fr 1fr}
+    .split{grid-template-columns:1fr;gap:40px}
+  }
+  @media (max-width:660px){
+    .nav-links{display:none}
+    .eyebrow{font-size:10px;letter-spacing:.1em;padding:6px 12px}
+    .shot-tabs{display:none}
+    .shot-nav{justify-content:space-between}
+    .stats{grid-template-columns:1fr 1fr}
+    .wf{grid-template-columns:1fr 1fr}
+    .wf-card:nth-child(n+4){display:none}
+    .wf-card b{font-size:11px}
+    .wf-card b em{font-size:9.5px}
+    .row{grid-template-columns:1.4fr auto auto}
+    .row .wfn{display:none}
+    .out{grid-template-columns:1fr 1fr}
+    .cards,.steps{grid-template-columns:1fr}
+    section.block{padding:72px 0}
+    .shot-body{padding:16px}
+    .msg-head time{font-size:10px}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#" aria-label="Jardinero home">
+      <svg class="mark" width="26" height="26" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+        <circle cx="16" cy="16" r="2.6"/>
+        <circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/>
+        <circle cx="27.5" cy="16" r="1.6"/><circle cx="24.13" cy="24.13" r="1.6"/><circle cx="16" cy="27.5" r="1.6"/><circle cx="7.87" cy="24.13" r="1.6"/><circle cx="4.5" cy="16" r="1.6"/><circle cx="7.87" cy="7.87" r="1.6"/><circle cx="16" cy="4.5" r="1.6"/><circle cx="24.13" cy="7.87" r="1.6"/>
+      </svg>
+      Jardinero
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#oss">Open source</a>
+      <a href="#tenki">Tenki</a>
+    </nav>
+    <a class="btn btn-primary" href="https://github.com/LuxorLabs/jardinero" style="margin-left:auto">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow"><span class="dot"></span>Open source &middot; from the team at Tenki</span>
+      <h1>Tends your codebase<br>while you&rsquo;re away.</h1>
+      <p class="lede">Jardinero is an always-on AI engineer &mdash; a small factory of machines that watches your logs, fixes what breaks in disposable sandboxes, takes Linear issues to done, and keeps every pull request moving toward merge.</p>
+      <span class="pron">/ har&middot;dee&middot;NEH&middot;ro / &mdash; &ldquo;gardener,&rdquo; in Spanish</span>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="https://github.com/LuxorLabs/jardinero">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .8l2.17 4.4 4.86.71-3.52 3.43.83 4.84L8 11.9l-4.34 2.28.83-4.84L.97 5.91l4.86-.71z"/></svg>
+          Star on GitHub
+        </a>
+        <a class="btn btn-ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+
+    <svg class="hills" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3e2a0"/><stop offset="1" stop-color="#a9d382"/></linearGradient>
+        <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#96c973"/><stop offset="1" stop-color="#77b45c"/></linearGradient>
+        <linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#67a854"/><stop offset="1" stop-color="#4d8f44"/></linearGradient>
+      </defs>
+      <path fill="url(#h1)" d="M0,190 C220,140 460,128 720,160 C980,192 1220,150 1440,118 L1440,320 L0,320 Z"/>
+      <path fill="url(#h2)" d="M0,240 C260,196 520,190 780,218 C1040,246 1250,214 1440,190 L1440,320 L0,320 Z"/>
+      <path fill="url(#h3)" d="M0,288 C300,254 580,250 860,270 C1140,290 1310,272 1440,254 L1440,320 L0,320 Z"/>
+    </svg>
+  </section>
+
+  <section class="showcase" aria-label="Product overview">
+    <div class="container">
+      <div class="shot" role="img" aria-label="The Jardinero Factory Overview dashboard: sandboxes running, five workflow machines, and in-progress instances">
+        <div class="shot-nav">
+          <span class="shot-brand">
+            <svg class="mark" width="17" height="17" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+              <circle cx="16" cy="16" r="2.6"/>
+              <circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/>
+            </svg>
+            Jardinero
+          </span>
+          <div class="shot-tabs">
+            <span class="active">Factory Overview</span><span>Operation</span><span>Requests</span><span>Pull requests</span><span>Event logs</span><span>Prompts</span>
+          </div>
+          <span class="live"><i></i>Live updates connected</span>
+        </div>
+        <div class="shot-body">
+          <div class="shot-head"><h3>Factory Overview</h3><time>Updated 0s ago</time></div>
+          <p class="shot-sub">What each machine is holding, what it produced, and what is waiting for a person.</p>
+          <div class="stats">
+            <div class="stat blue"><span class="lab">Sandboxes running</span><span class="num">6 / 10</span></div>
+            <div class="stat"><span class="lab">Open instances</span><span class="num">3</span></div>
+            <div class="stat"><span class="lab">Requires attention</span><span class="num">0</span></div>
+            <div class="stat"><span class="lab">Version</span><span class="num">0.3.0</span></div>
+          </div>
+          <p class="sect-lab">Workflows</p>
+          <div class="wf">
+            <div class="wf-card"><b>RequestRouter <em>0/1</em></b><span class="st">nothing open</span></div>
+            <div class="wf-card"><b>LinearImplementer <em>1/1</em></b><span class="chip">building JAR-118</span></div>
+            <div class="wf-card"><b>FixImplementer <em>1/1</em></b><span class="chip">tests green &middot; 34/34</span></div>
+            <div class="wf-card"><b>LogReviewer <em>2/2</em></b><span class="chip">scanning api-prod</span></div>
+            <div class="wf-card"><b>PrMaintainer <em>1/1</em></b><span class="chip">resolving conflicts</span></div>
+          </div>
+          <p class="sect-lab">In progress</p>
+          <div class="rows">
+            <div class="row"><span class="ref">jardinero @ jardinero</span><span class="wfn">LogReviewer</span><span class="chip">scanning telemetry</span><time>03:47</time></div>
+            <div class="row"><span class="ref">acme/web</span><span class="wfn">FixImplementer</span><span class="chip">opening PR #482</span><time>03:59</time></div>
+            <div class="row"><span class="ref">acme/api</span><span class="wfn">PrMaintainer</span><span class="chip">carrying #479 to merge</span><time>05:10</time></div>
+          </div>
+          <p class="sect-lab">Output</p>
+          <div class="out">
+            <div><span class="lab">Items triaged</span><div class="num">128</div></div>
+            <div><span class="lab">PRs opened</span><div class="num">46</div></div>
+            <div><span class="lab">PRs merged</span><div class="num">41</div></div>
+            <div><span class="lab">Incidents handled</span><div class="num">9</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="shot-cap">The Factory Overview &mdash; every machine, every open instance, and the short queue that actually needs a human. If nothing needs you, nothing pings you.</p>
+      <div class="machines" aria-label="Jardinero's workflow machines">
+        <span>RequestRouter</span><span>LogReviewer</span><span>LinearImplementer</span><span>FixImplementer</span><span>PrMaintainer</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="container">
+      <div class="center">
+        <p class="sec-eyebrow">What it does</p>
+        <h2>One gardener, three jobs.</h2>
+        <p class="sec-lede">Jardinero runs a factory of small, focused machines. Each one watches a different door into your codebase &mdash; and they all ship the same thing: pull requests you can review over coffee.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 13h4l3-8 4 16 3-8h6"/></svg></div>
+          <h3>The night watch</h3>
+          <p>It reviews your production telemetry &mdash; Grafana logs and metrics &mdash; every few minutes, around the clock. Signals are scored against an investigation threshold: noise gets rejected with a reason, and anything real is reproduced in a sandbox and fixed. It even checks whether an open PR already covers the issue before writing a line.</p>
+          <div class="tag"><span>LogReviewer</span></div>
+        </div>
+        <div class="card">
+          <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><path d="M6 9v6"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/><circle cx="18" cy="6" r="3"/></svg></div>
+          <h3>The implementer</h3>
+          <p>Assign a Linear issue to Jardinero and it goes to work: it scopes the task, builds it in an isolated sandbox, runs the tests, and hands back a PR that&rsquo;s ready to review &mdash; posting a link so you can watch it work in real time.</p>
+          <div class="tag"><span>LinearImplementer</span><span>FixImplementer</span></div>
+        </div>
+        <div class="card">
+          <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg></div>
+          <h3>The pruner</h3>
+          <p>Tag <code style="font-family:var(--mono);font-size:.9em">@jardinero</code> on a GitHub issue or pull request. It answers review threads with evidence, fixes failing checks, resolves conflicts, follows your repo&rsquo;s conventions &mdash; and knows when a thread doesn&rsquo;t need one more reply.</p>
+          <div class="tag"><span>PrMaintainer</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0" aria-label="Overnight activity">
+    <div class="container">
+      <div class="center">
+        <p class="sec-eyebrow">Always on</p>
+        <h2>4:03 a.m., on a Wednesday.</h2>
+        <p class="sec-lede">Every run reports in where your team already lives. Most end in a considered &ldquo;nothing needed&rdquo; &mdash; and when something is real, you wake up to a fix, not a fire.</p>
+      </div>
+      <div class="feed">
+        <div class="msg">
+          <div class="msg-head">
+            <span class="av"><svg class="mark" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/></svg></span>
+            <b>Jardinero</b><span class="badge-app">APP</span><time>1:23 AM</time>
+          </div>
+          <p class="body"><b>Log Review: Succeeded</b><br>Reviewed production telemetry via Grafana. No issue met the 0.7 investigation threshold; no implementation handoff is needed.</p>
+          <div class="msg-meta"><span>log_review</span><span class="ok">Succeeded</span></div>
+        </div>
+        <div class="msg">
+          <div class="msg-head">
+            <span class="av"><svg class="mark" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/></svg></span>
+            <b>Jardinero</b><span class="badge-app">APP</span><time>2:07 AM</time>
+          </div>
+          <p class="body"><b>Log Review: Succeeded</b><br>One actionable candidate found: a 2.5&times; increase in router-state parsing errors after deploy. Two signals rejected as provider noise; one is already covered by open PR #4255.</p>
+          <div class="msg-meta"><span>log_review</span><span class="ok">Succeeded</span></div>
+        </div>
+        <div class="msg">
+          <div class="msg-head">
+            <span class="av"><svg class="mark" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/></svg></span>
+            <b>Jardinero</b><span class="badge-app">APP</span><time>2:31 AM</time>
+          </div>
+          <p class="body"><b>Fix Implementation: Succeeded</b><br>Reproduced the router-state errors in a sandbox, patched the parser guard, and opened PR #4271. Focused regression tests: 21/21 passed.</p>
+          <div class="msg-meta"><span>fix_implement</span><span class="ok">Succeeded</span></div>
+        </div>
+        <div class="msg">
+          <div class="msg-head">
+            <span class="av"><svg class="mark" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/></svg></span>
+            <b>Jardinero</b><span class="badge-app">APP</span><time>4:13 AM</time>
+          </div>
+          <p class="body"><b>PR Maintenance: Succeeded</b><br>Updated PR #1240: replied on both review threads, widened the flaky timestamp assertion, pushed. Focused tests green; CI running for the new commit.</p>
+          <div class="msg-meta"><span>pr_maintain</span><span class="ok">Succeeded</span></div>
+        </div>
+        <div class="msg attn">
+          <div class="msg-head">
+            <span class="av"><svg class="mark" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/></svg></span>
+            <b>Jardinero</b><span class="badge-app">APP</span><time>6:58 AM</time>
+          </div>
+          <p class="body"><b>JAR-74 needs a person: iterations_exhausted.</b></p>
+          <div class="msg-meta"><span>linear_implement</span><span class="warn">Requires attention</span></div>
+        </div>
+      </div>
+      <p class="feed-cap">When it&rsquo;s genuinely stuck, it says so &mdash; once &mdash; and waits for a human. No retry storms, no forty-message threads.</p>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="container">
+      <div class="center">
+        <p class="sec-eyebrow">How it works</p>
+        <h2>Plant it once. It keeps growing.</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="n">01</span>
+          <h3>Connect</h3>
+          <p>Install the GitHub and Linear apps, hook up your telemetry, and point Jardinero at your repos. Run it on your laptop, or drop it on a server and share it with your team &mdash; run reports land in your Discord.</p>
+        </div>
+        <div class="step">
+          <span class="n">02</span>
+          <h3>Let the machines run</h3>
+          <p>Every job happens in a disposable sandbox &mdash; reproduce, fix, test &mdash; with a pool of them running in parallel. Nothing touches your branches until the work is green.</p>
+        </div>
+        <div class="step">
+          <span class="n">03</span>
+          <h3>Review and merge</h3>
+          <p>You stay the gardener-in-chief. Jardinero ships PRs; anything that genuinely needs a person &mdash; an exhausted retry, a judgment call &mdash; waits quietly in a small &ldquo;requires attention&rdquo; queue.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="oss" style="background:#fff;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)">
+    <div class="container split">
+      <div>
+        <p class="sec-eyebrow">Open source</p>
+        <h2>Yours, root and stem.</h2>
+        <p class="sec-lede">Every big lab runs a private fleet of coding agents. Jardinero is the fleet you can fork &mdash; the same always-on engineer we run on our own codebase, released in the open.</p>
+        <ul class="checks">
+          <li><span class="ck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><div>Self-host anywhere<small>Your laptop, your server, your rules. Bring your own keys.</small></div></li>
+          <li><span class="ck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><div>Nothing hidden<small>The prompts, the workflows, the machines &mdash; it&rsquo;s all in the repo.</small></div></li>
+          <li><span class="ck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><div>Built in the open<small>Issues, roadmap, and contributions welcome under LuxorLabs.</small></div></li>
+        </ul>
+      </div>
+      <div class="repo">
+        <div class="repo-top">
+          <svg class="mark" width="20" height="20" viewBox="0 0 32 32" fill="var(--green)" aria-hidden="true">
+            <circle cx="16" cy="16" r="2.6"/>
+            <circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/>
+          </svg>
+          <span>LuxorLabs&nbsp;/&nbsp;<b>jardinero</b></span>
+        </div>
+        <p>An always-on AI engineer that tends your codebase: log review, issue implementation, and PR maintenance &mdash; in disposable sandboxes.</p>
+        <div class="repo-meta">
+          <span>v0.3.0</span><span>open source</span><span>self-hostable</span>
+        </div>
+        <a class="btn btn-primary" href="https://github.com/LuxorLabs/jardinero">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .8l2.17 4.4 4.86.71-3.52 3.43.83 4.84L8 11.9l-4.34 2.28.83-4.84L.97 5.91l4.86-.71z"/></svg>
+          Star LuxorLabs/jardinero
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block tenki" id="tenki">
+    <div class="container center">
+      <p class="sec-eyebrow">Who&rsquo;s behind it</p>
+      <h2>Grown at Tenki.</h2>
+      <p class="sec-lede">Jardinero is built by <a href="https://tenki.cloud" style="text-decoration:underline;text-underline-offset:3px">Tenki</a>, part of Luxor &mdash; and it tends Tenki&rsquo;s own codebase every day. It spins up Tenki sandboxes to reproduce and test each change: fast, isolated, and gone when the job is done.</p>
+      <div class="tenki-ctas">
+        <a class="btn btn-green" href="https://tenki.cloud">Explore tenki.cloud &rarr;</a>
+        <a class="btn btn-ghost" href="https://tenki.cloud">Tenki for Startups</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="container">
+      <h2>Plant it in your repo.</h2>
+      <p>Free. Open source. Always on.</p>
+      <a class="btn btn-primary" href="https://github.com/LuxorLabs/jardinero" style="font-size:16.5px;padding:14px 28px">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        View Jardinero on GitHub
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container foot">
+    <div>
+      <span class="brand">
+        <svg class="mark" width="22" height="22" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+          <circle cx="16" cy="16" r="2.6"/>
+          <circle cx="22" cy="16" r="2.3"/><circle cx="20.24" cy="20.24" r="2.3"/><circle cx="16" cy="22" r="2.3"/><circle cx="11.76" cy="20.24" r="2.3"/><circle cx="10" cy="16" r="2.3"/><circle cx="11.76" cy="11.76" r="2.3"/><circle cx="16" cy="10" r="2.3"/><circle cx="20.24" cy="11.76" r="2.3"/>
+        </svg>
+        Jardinero
+      </span>
+      <p class="foot-note" style="margin-top:8px">Built by Tenki, part of Luxor. &copy; 2026 Luxor Technology.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="https://github.com/LuxorLabs/jardinero">GitHub</a>
+      <a href="https://tenki.cloud">tenki.cloud</a>
+      <a href="https://jardinero.dev">jardinero.dev</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
