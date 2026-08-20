@@ -120,7 +120,8 @@
   .plant .st{stroke:#265c2e;stroke-width:3.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
   .plant .leaf{fill:#468c3f;stroke:#2c6631;stroke-width:1.3}
   .plant .pop,.plant .leaf{transform-box:fill-box;transform-origin:50% 100%}
-  .grass path{vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:50% 100%}
+  .grass path{vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:50% 100%;transition:opacity .5s ease}
+  .grass path.trampled{opacity:0!important;transition-duration:.15s}
   @media (max-width:1023px){.flora{display:none}}
 
   @media (prefers-reduced-motion: no-preference){
@@ -939,6 +940,40 @@
     </nav>
   </div>
 </footer>
+
+<script>
+(() => {
+  if (!matchMedia('(pointer:fine)').matches) return;
+  const paths = [...document.querySelectorAll('.grass path')];
+  const hero = document.querySelector('.hero');
+  if (!paths.length || !hero) return;
+  let pts = null;
+  const cache = () => {
+    pts = paths.map(p => {
+      const r = p.getBoundingClientRect();
+      return { p, x: r.left + r.width / 2 + scrollX, y: r.bottom + scrollY };
+    });
+  };
+  addEventListener('resize', () => { pts = null; }, { passive: true });
+  const timers = new Map();
+  const R2 = 55 * 55;
+  let last = 0;
+  hero.addEventListener('mousemove', e => {
+    const now = performance.now();
+    if (now - last < 40) return;
+    last = now;
+    if (!pts) cache();
+    for (const t of pts) {
+      const dx = t.x - e.pageX, dy = t.y - e.pageY;
+      if (dx * dx + dy * dy < R2) {
+        t.p.classList.add('trampled');
+        clearTimeout(timers.get(t.p));
+        timers.set(t.p, setTimeout(() => t.p.classList.remove('trampled'), 5000));
+      }
+    }
+  }, { passive: true });
+})();
+</script>
 
 </body>
 </html>
