@@ -1,0 +1,25 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "A · Tea Garden", "x": 0, "y": 0, "w": 900, "h": 1240 },
+    { "file": "Parterre.dc.html", "title": "B · Parterre", "x": 960, "y": 0, "w": 900, "h": 1240 },
+    { "file": "Allee.dc.html", "title": "C · Allée", "x": 1920, "y": 0, "w": 900, "h": 1240 },
+    { "file": "Moves.dc.html", "title": "Six moves", "x": 0, "y": 1320, "w": 1400, "h": 880 }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -180,
+      "w": 620,
+      "text": "Three directions drawn from your five references, plus the moves that apply whichever one wins.\n\nA and B are opposites on purpose: Japanese asymmetry vs Versailles geometry. C is the least disruptive — it evolves the framing the page already has.\n\nPick a direction (or a hybrid) and I'll build it into the real page."
+    },
+    {
+      "id": "note-pairing",
+      "x": 1920,
+      "y": -180,
+      "w": 420,
+      "text": "Worth noting: A's vermillion and B's plan-view diagram are not mutually exclusive. The strongest hybrid is probably A's palette and warmth with B's aerial plan for the five machines."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

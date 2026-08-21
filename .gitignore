@@ -1,2 +1,4 @@
 .vercel
 .DS_Store
+.agents/
+models/__cadgen__/
