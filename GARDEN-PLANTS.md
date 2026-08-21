@@ -1,5 +1,11 @@
 # The garden in the photograph
 
+> **Not the live design.** This documents a photographic parterre direction the
+> hero briefly used. The live hero is the CSS-drawn rolling garden described in
+> [`ANIMATION-PROMPT.md`](ANIMATION-PROMPT.md). Kept because the palette analysis
+> and the seven-layer segmentation are reusable, and the assets are still in
+> `assets/` and `assets/layers/`.
+
 A breakdown of `assets/hero-1920.webp` into its distinct plant types, and how each
 one is represented in the animated CSS foreground. Colours are sampled from the
 image itself (median-cut quantisation plus point sampling), not eyeballed.

@@ -1,201 +1,61 @@
-# Prompt: "A Day in the Garden" — the jardinero.com hero
+# Prompt: "A Day in the Garden" — the jardinero.com hero animation
 
-A complete specification of the live hero: a photograph of a formal parterre
-garden, cut into parallax layers, living through a never-ending cycle of days,
-with a planted foreground that grows across three of them.
-
-Companion documents: [`GARDEN-PLANTS.md`](GARDEN-PLANTS.md) breaks the
-photograph down into its plant types and records the sampled palette.
+Use this prompt to recreate the animated hero scene from scratch. A reference list of open-source scenes in the same spirit — with licenses — follows the prompt, plus optional flourishes borrowed from them.
 
 ---
 
-## The base: a photograph in seven layers
+Build a self-contained HTML + CSS hero-section animation (no libraries; the only JavaScript is a few lines of IntersectionObserver that pauses the scene off-screen) of a stylized light-theme landscape that lives through a never-ending cycle of days. The hero contains centered marketing text (eyebrow chip, headline, lede, CTA buttons); the landscape animates around it and never touches it. The mood is soft, pastel, Ghibli-adjacent — calm daylight, warm dusk, deep quiet night.
 
-The backdrop is `assets/hero-1920.webp`, a formal French parterre — clipped
-columnar yews in two receding rows, a broderie of pale gravel cut into lawn,
-stone urns, a reflecting basin, deep woodland behind. It is cut into seven
-transparent WebP layers, back to front:
+**Scene layers, back to front:** a pale sky gradient; a celestial layer (sun, moon, four stars); three stacked rolling-hill silhouettes in layered greens (one SVG stretched full-width via `preserveAspectRatio="none"`, ridge crests near the top of its box so plenty of green shows above the fold); a meadow of ~1,700 grass tufts; two giant stylized corner plants; and two full-bleed color-wash overlays (warm peach "sunset", deep blue "dusk") layered above the hills but below the text. All scenery is `pointer-events:none` and `aria-hidden`. Z-order matters: celestial layer BELOW the hills (so rising and setting are true occlusion), grass and plants above the hills, tints above those, text above everything.
 
-| # | Layer | Contains |
-| --- | --- | --- |
-| 1 | `sky` | the flat blue gradient |
-| 2 | `trees` | the horizon woodland between the yew rows |
-| 3 | `columns` | both flanking rows plus the small central cluster at the vanishing point |
-| 4 | `lawn` | tapis vert, parterre lawn, gravel broderie |
-| 5 | `urns` | the two stone pedestal urns |
-| 6 | `pool` | the reflecting basin and its lilies |
-| 7 | `flowers` | foreground mixed border and the bottom hedge band |
+**Master clock:** one solar day = 40 seconds. Every animation is `40s linear infinite` (the meadow uses `120s`) and they all start together, so the whole scene is synchronized purely by keyframe percentages — pausing every animation at the same currentTime must always produce one coherent moment of the day. Animate only `transform`, `opacity`, and `stroke-dashoffset`.
 
-**Cut them by measurement, not by eye.** A row profile locates the horizontal
-bands (sky is 100% blue to y=430; gravel peaks at y=1104; water sits at
-y=1296). A *skyline* profile — the first non-sky pixel in every column —
-separates the flanking yew rows from the woodland between them: the rows break
-the sky at y≈430–520 while the treeline tops out at y≈560–744. Mask with a
-blue-key for sky plus those measured bands, feather the alpha so each seam
-falls beneath the layer in front, and verify by recompositing all seven back
-into the original.
+**The sun (daytime, 0–62%):** a warm radial-gradient disc with two soft box-shadow glow halos, anchored to a horizon baseline derived from the hills' height (a shared CSS variable). It rises from behind the hills at the far left, climbs the text-free left margin, crosses the narrow empty band above the headline (apex dead-center at 31%), descends the right margin, and sinks behind the hills at 62%. While hidden below the horizon it slides back to the left at opacity 0 and breaks the horizon again at 98–100%, whose keyframe values exactly equal 0% so the loop is seamless.
 
-Anchor every layer `background-position: center 84%`. On a wide viewport the
-image is cropped ~400px vertically; at 84% almost all of that comes off the
-flat sky, which costs nothing, instead of off the foreground border, which is
-the most detailed and nearest part of the scene.
+**Nightfall and night:** the sunset tint's opacity peaks exactly as the sun crosses the horizon (~62%, and again at dawn ~98%); the dusk veil holds through 66–88% and should make it genuinely dark — a blue-navy gradient (strongest near the ground, ~0.5 element opacity at peak) that tints hills, grass, and plants but never the text. A pale glowing moon (smaller disc, white-blue radial gradient, crisp 1px rim) arcs the same arch path from 66–95%; the stars fade in at ~70% and out by ~96%.
 
-Use transparent **WebP**, not PNG — identical alpha, roughly a sixth of the
-weight (700KB for the set against ~4MB). Ship a 960px set for small screens.
+**The plants (one per bottom corner, mirrored):** each is an SVG with a curved main stem, two branches, and five leaves, sized up to ~920px wide and shifted partly off-canvas (negative left/right offset, clipped by the overflow-hidden scenery layer) so giant foliage frames the hero from the corners without reaching the text column. Stems and branches are strokes with `pathLength="1"`, `stroke-dasharray:1`, and `stroke-dashoffset` animating 1→0 in a stagger through sunrise (4–24%), so the plant literally draws itself upward as the sun climbs. GOTCHA: a fully-retracted stroke (`dashoffset:1`) with `stroke-linecap:round` renders a zero-length dash as a floating dot — in retracted states overshoot the offset (1.02) AND hold opacity 0. Leaves are pointed-oval paths that scale-pop (with a small overshoot) from their attachment points — `transform-box:fill-box; transform-origin:50% 100%` — in sequence from lowest to the crown leaf, which opens exactly at noon. Heliotropism: every leaf carries a second rotation animation sweeping from leaning east (−16°) at sunrise, to upright at noon, to leaning west (+20°) as the sun descends — put rotation on the leaf path and the pop-scale on a wrapper group so the two transforms compose. The right plant is the same markup inside a `scaleX(-1)` container, with negated rotation keyframes so both plants face the same absolute direction. **Plants persist and accumulate.** A plant that has grown never retracts — it stays for the rest of the epoch, merely dimmed at night by a `filter: brightness(.55) saturate(.75)` animation on its wrapper (needed because plants sit above the dusk veil in z-order). Plant growth therefore runs on the 120s epoch clock, not the 40s day: day one grows the two giant corner plants, day two adds a mid-size pair further inboard, day three adds a smaller pair — the garden thickens with every sunrise, exactly like the meadow, and only clears in the deep night of day three. Heliotropism stays on the 40s day clock; because rotation lives on the leaf paths and growth on their wrapper groups, the two clocks compose without conflict.
 
-## The backdrop is still
+**The meadow (three-day epoch, 120s):** ~1,700 grass tufts — each 2–3 short curved stroke blades with `vector-effect:non-scaling-stroke` — generated by a script that samples the cubic-Bézier ridge curves of all three hills and scatters tufts DOWN each hill's face (jittered spacing, height, lean, and a couple of shade variants per layer; taller and darker when nearer). Because grass groups are interleaved with the hill paths in DOM order, each hill automatically occludes the overflow of the layer behind it. Split the tufts into three daily waves of six sub-groups each (18 shared keyframe timelines — never per-element delays, which would break sync). The meadow's loop spans three solar days: wave one sprouts through day one's morning (the group fades up from opacity 0 while rising ~7 user units — see the performance rules for why this is a group transform, not a per-tuft one), wave two joins at day two's sunrise, wave three at day three's — every time the sun comes up, more grass grows, and the field visibly thickens day over day. In the deepest night of day three (~97–99% of the 120s), all grass fades out together so the epoch restarts invisibly.
 
-The photograph does not move. An earlier build cut it into seven parallax
-layers — sky, treeline, columns, lawn, urns, pool, foreground border — each
-drifting on its own clock and following the cursor by depth. The layer assets
-are still in `assets/layers/` and the technique is recorded under "Still on the
-shelf" below, but the live hero uses the single image: with the motion gone the
-split was seven requests and 700KB where one image is 585KB and looks identical.
+**Sunflowers and butterflies:** four sunflowers stand among the meadow (absolutely positioned mini-SVGs on the hill faces, behind the product card): a stem that draws itself at sunrise, two small leaves, and a 12-petal head (petal ellipses rotated around a brown disc) that pops open mid-morning and — being a sunflower — tracks the sun harder than the leaves do, sweeping −26°→0→+24° through the day on a bottom-center pivot, closing at dusk. Two butterflies work the day shift: each is a tiny SVG whose wings flap via fast alternating `scaleX` loops (~0.42s, transform-origin at the body), riding a wrapper that wanders a zig-zag path across the meadow in the 40s day (one flies west-to-east appearing ~12–65%, the mirror one east-to-west ~18–63%), fading in and out at the ends so night has no butterflies.
 
-## The day
+**Ambience:** three flat rounded clouds drift slowly across the sky band on very long linear loops (120–200s, negative delays to de-cluster), dimmed at night by the dusk veil since they live below it. Five fireflies — warm glowing dots near the grass line — blink and drift upward through the night window (66–95%) on three staggered rhythm variants, layered above the veils so they burn bright. Wind: each plant and sunflower SVG runs a slow `skewX(±0.6deg)` ease-in-out alternate loop (4.6–6.1s, varied durations and negative delays, origin at the roots) so gusts feel unsynchronized. Do NOT extend this sway to the grass groups — see the performance rules.
 
-**Master clock: one solar day = 40 seconds; the planting epoch is 120 seconds —
-three days.** Everything is `linear infinite` on one of those two durations and
-they all start together, so the scene is synchronised purely by keyframe
-percentage. Pausing every animation at the same `currentTime` must always
-produce one coherent moment. Animate only `transform`, `opacity`,
-`stroke-dashoffset` and `filter`.
+**Responsive:** drive the hills' height (and the sun/moon horizon baseline) from one CSS variable — taller cap on large screens so green fills the lower third of the viewport. Under ~660px there is no text-free sky, so swap the sun/moon keyframes (via a media query that redefines the same @keyframes names) for a low roll skimming along the ridge line, hide the corner plants below ~1024px, freeze the grass fully grown, and hide the dense tier (~55% of tufts carry a density class) to keep mobile light.
 
-**Sun and moon cross level, and never set.** Both are anchored to the *top* of
-the hero with a viewport-relative clamp — not to a horizon offset from the
-bottom, which cannot survive a change of viewport height. The sun enters off the
-left edge, traverses the full width at constant height (measured drift: 8px
-across the whole crossing) and exits right, fading at both ends. The moon does
-the same through the night window. Neither dips behind the garden.
+**Performance architecture (this is what keeps it smooth):** the scene looks heavy — ~1,700 tufts, ~1,800 SVG paths — but must stay cheap, so obey these rules:
 
-**Nightfall.** A warm sunset veil peaks as the sun leaves; a deep blue-navy dusk
-veil holds through the night. Both sit *above* the photograph and above the
-planted foreground, so dusk darkens the whole scene together — an early build
-left the CSS planting glowing bright green at midnight while the photograph went
-dark. Stars and fireflies sit *above* the veils, or the veil dims the very
-things it is meant to reveal.
+1. **Never animate a transform on a `<g>` inside a big SVG continuously.** SVG child elements are not promoted to their own compositor layers in Chrome, so a transform on one `<g>` re-rasterizes the *entire* SVG every frame, forever. An earlier build swayed the three grass groups with `skewX(0.7deg)`; on a 20px blade that moves the tip **0.24px** — invisible — while repainting all 1,700 paths at 60fps. Do the arithmetic before adding a sway: keep it only where the element is tall enough to see it (a 900px plant skewed 0.6° moves ~11px) *and* is a separately-composited HTML element.
+2. **Animate wave groups, not individual tufts.** Wrap each wave's paths in a `<g class="gw1a">` and animate the group (opacity plus a ~7-unit `translateY` rise reads exactly like sprouting). That is ~54 animations instead of ~1,700 — measured drop from 1,884 to 241 running animations, and forced style+layout per pass fell from 8.9ms to 3.5ms.
+3. **Promote only the handful of continuous movers** — sun, moon, clouds, butterflies, fireflies — with `will-change: transform`. They are HTML elements, so each becomes its own layer and their motion never repaints the hero. Keep this list short; every layer costs memory.
+4. **Stop the scene when it is off-screen.** One small IntersectionObserver toggles a `.hero-paused` class whose `animation-play-state: paused !important` cascades to every descendant, so scrolling down to read the page costs nothing. This is the only JavaScript in the page.
 
-## The planting: grass, topiary, sunflowers
-
-The photograph supplies the middle and far distance. The CSS planting is the
-**near foreground** — a bed in front of the basin, occupying the same plane as
-layer 7. Give it the foreground depth (`--d: 42`) so it tracks the cursor with
-the border it stands in.
-
-**Match the photograph's palette, which is the whole trick.** Its greens are
-near-black and cool (`#04180d`, `#012715`); the only bright green is a
-yellow-olive where sun strikes clipped foliage (`#484e0f` — the single largest
-colour in the image). Friendly mid-greens read instantly as a different garden:
-an earlier build's bright CSS columns looked like a different plant species
-standing in front of the photograph's own.
-
-### Topiary — clipped columnar yews
-Narrow dome-topped columns at the photograph's own proportion, roughly 1:6
-width to height, in two rows that recede toward the central vista: tall at the
-frame edges, shrinking toward the middle, exactly as the real rows do. Three
-paths each — body, sunlit face, lit crown — filled from shared gradients
-(`#04170c`→`#2b4d13` vertically; a warm right-edge highlight to `#6a8f28`; a
-crown wash to `#88ad39`). Flat fills read as a picket fence; the gradients are
-what make them foliage. Add clipped box balls on short stone plinths
-(`#8d7f5e`) nearer the centre and lower down.
-
-### Grass — a fringe, not a meadow
-This is a formal garden: no wild meadow, no drifts. Grass belongs as a fine
-fringe along the top edge of the foreground hedge band and at the feet of the
-columns — short dark tufts (`#0a2612`) with occasional yellow flecks
-(`#c3ad3c`), echoing the flowering hedge at the very front of the photograph.
-Generate them by sampling along the hedge line with jittered height and lean,
-two or three curved stroke blades each, `vector-effect: non-scaling-stroke`.
-
-### Sunflowers — in the border beds, in the photograph's own gold
-Sunflowers are not native to a French parterre, so plant them where the
-photograph already has mixed flowering shrubs: the border beds at the frame
-edges, scaled small, never in the formal centre. Use the image's amber and gold
-(`#d18d47`, `#c3ad3c`) rather than a bright cartoon yellow. Stem draws itself at
-sunrise, two leaves, then a 12-petal head — petal ellipses rotated around a
-brown disc — that pops open mid-morning.
-
-**Heliotropism follows the level traverse.** Because the sun now crosses
-horizontally rather than arcing, the heads should *turn* rather than tilt:
-sweep the head from facing left at dawn, through square-on at midday, to facing
-right at dusk, on a bottom-centre pivot, closing at nightfall. Put the rotation
-on the head and the pop-scale on a wrapper group so the two transforms compose.
-
-### Growth across three days
-Every planted thing arrives on one of three waves (`d1`/`d2`/`d3`) and **keeps
-growing after it arrives** — scale from its sprout moment toward full across the
-whole 120s epoch, so the garden both gains members and matures. Day one plants
-the first columns and border, day two adds more, day three more again; the
-epoch clears only in the deep night of day three so the loop restarts unseen.
-
-Growth needs its own nesting level. A plant element already carries a static
-mirror transform and a night filter, and its SVG carries the wind sway, so put
-the growth scale on a wrapper between them — three transforms, three elements,
-no collisions.
-
-## Ambience
-
-Flat rounded clouds drift across the sky band on very long loops, dimmed at
-night because they live below the veils. Butterflies work the day shift: real
-anatomy — separate forewing and hindwing beating *out of phase*, which is what
-makes flight read as fluttering rather than flapping — with a nested wrapper so
-body bank and bob compose with the path animation. Fireflies blink and drift
-upward through the night window, above the veils. Wind is a slow `skewX(±0.6°)`
-ease-in-out alternate on each plant SVG, durations and negative delays varied so
-gusts never synchronise.
-
-## Performance architecture
-
-1. **Never animate a transform on a `<g>` inside a large SVG continuously.** SVG
-   children are not promoted to their own compositor layer in Chrome, so one
-   animated `<g>` re-rasterises the entire SVG every frame, forever. Do the
-   arithmetic first: a 0.7° skew moves a 20px blade tip **0.24px** — invisible,
-   while repainting everything. Keep sway only where the element is tall enough
-   to see it *and* is a separately-composited HTML element.
-2. **Animate wave groups, not individual plants.** Wrapping tufts into shared
-   wave groups took one build from 1,884 running animations to 241, and forced
-   style+layout from 8.9ms to 3.5ms per pass. Never per-element delays — they
-   break the shared clock.
-3. **Promote only the continuous movers** — sun, moon, clouds, butterflies,
-   fireflies, and the seven parallax wrappers — with `will-change: transform`.
-   Every layer costs memory; keep the list short.
-4. **Stop the scene off-screen.** One IntersectionObserver toggles a
-   `.hero-paused` class whose `animation-play-state: paused !important` cascades
-   to every descendant.
-5. **Isolate the hero.** `isolation: isolate` on the hero, or a foreground layer
-   with a high z-index will escape into the root stacking context and paint over
-   the product card below.
-
-## Accessibility
-
-Every animation lives inside `@media (prefers-reduced-motion: no-preference)`,
-and the cursor parallax is skipped entirely for those users. Base styles are a
-pleasant static midday — sun up, planting fully grown, veils off — so
-reduced-motion visitors get the finished garden, not an empty bed.
+**Accessibility:** every animation lives inside `@media (prefers-reduced-motion: no-preference)`. The base styles are a pleasant static mid-morning — sun up, plants fully grown and upright, full meadow, tints off — so reduced-motion users get the finished scene, not an empty field.
 
 ---
 
-## Open-source reference scenes
+## Open-source reference scenes in the same spirit
 
-All public CodePen pens are MIT by CodePen's terms of service.
+Borrow techniques (or code, license permitting) from these. All public CodePen pens are MIT-licensed by CodePen's terms of service.
 
 **Same medium (CSS/SVG day-night landscapes):**
-- [Day-Night Cycle Animated With SVG & CSS](https://codepen.io/chiranjeeb/pen/vYJjmY) (MIT) — keyframed sun arc and sky sweep.
-- [SVG Animated Day-Night Sky Cycle](https://codepen.io/kpk/pen/LYWgOd) (MIT) — animates the sky *gradient stops* through the cycle; a richer alternative to opacity veils.
-- [Day-Night Cycle Animated With CSS](https://codepen.io/zenete/pen/jOOQqrQ) (MIT) and [Svg and css landscape animation](https://codepen.io/guillaume_lt/pen/qdgoNL) (MIT) — layered landscapes.
+- [Day-Night Cycle Animated With SVG & CSS](https://codepen.io/chiranjeeb/pen/vYJjmY) (MIT) — keyframed sun arc + sky color sweep; compare its sun-tracking easing with ours.
+- [SVG Animated Day-Night Sky Cycle](https://codepen.io/kpk/pen/LYWgOd) (MIT) — animates the SKY GRADIENT stops themselves through the cycle; a richer alternative to our opacity-veil approach.
+- [Day-Night Cycle Animated With CSS](https://codepen.io/zenete/pen/jOOQqrQ) (MIT) and [Svg and css landscape animation](https://codepen.io/guillaume_lt/pen/qdgoNL) (MIT) — layered-landscape scenes with in-flow SVG hills like ours.
 
-**Vibe reference and upgrade path (Three.js):**
-- [craftzdog/ghibli-style-shader](https://github.com/craftzdog/ghibli-style-shader) (MIT) — gradient-lit stylised foliage; safe to copy.
-- [fromtheghost/ghibli-grass](https://github.com/fromtheghost/ghibli-grass) (no license file — reference only), [live demo](https://ghibli-grass.vercel.app).
-- [Fluffiest Grass with Three.js](https://tympanus.net/codrops/2025/02/04/how-to-make-the-fluffiest-grass-with-three-js/) (Codrops license) — its wind term translates to the CSS sway above.
-- [Breath of the Wild-style grass in WebGL](https://smythdesign.com/blog/stylized-grass-webgl/) — the clearest written account of stylised grass motion.
-- [yakudoo/TheAviator](https://github.com/yakudoo/TheAviator) (Codrops license) + [Karim Maaloul's CodePens](https://codepen.io/Yakudoo) (MIT) — canonical soft low-poly scenes.
-- [jeromeetienne/threex.daynight](https://github.com/jeromeetienne/threex.daynight) (MIT) — sun-angle→sky-colour mapping worth stealing for veil timing.
-- [jasonsturges/three-low-poly](https://github.com/jasonsturges/three-low-poly) — procedural low-poly scenery; check license before copying.
+**Vibe reference and upgrade path (Three.js, pastel/Ghibli):**
+- [craftzdog/ghibli-style-shader](https://github.com/craftzdog/ghibli-style-shader) (MIT) — Ghibli-styled gradient-lit trees in Three.js/React Three Fiber; the exact color language we're chasing, and safe to copy.
+- [fromtheghost/ghibli-grass](https://github.com/fromtheghost/ghibli-grass) (NO license file — reference only, don't copy) — shell-textured Ghibli grass, [live demo](https://ghibli-grass.vercel.app).
+- [How to Make the Fluffiest Grass with Three.js](https://tympanus.net/codrops/2025/02/04/how-to-make-the-fluffiest-grass-with-three-js/) (Codrops license: integrate/modify freely, don't redistribute as-is) — instanced wind-blown grass; its wind math translates to CSS sway (below).
+- [Breath of the Wild-style grass in WebGL](https://smythdesign.com/blog/stylized-grass-webgl/) — the best written explanation of stylized grass motion.
+- [yakudoo/TheAviator](https://github.com/yakudoo/TheAviator) (Codrops license) + [Karim Maaloul's CodePens](https://codepen.io/Yakudoo) (MIT) — the canonical soft-pastel low-poly scenes; his [Low Poly Tree Generator](https://codepen.io/Yakudoo/details/pgPgeb) could replace our corner plants if we ever go 3D.
+- [jeromeetienne/threex.daynight](https://github.com/jeromeetienne/threex.daynight) (MIT) — a complete sun-position/sky-color day-night cycle for Three.js; its sun-angle→sky-color mapping is worth stealing for tint timing.
+- [jasonsturges/three-low-poly](https://github.com/jasonsturges/three-low-poly) — procedural low-poly scenes (hills, foliage, atmosphere) if the hero ever becomes WebGL; check license before copying.
 
-## Still on the shelf
+## Remaining optional flourishes (borrowed from the references)
 
-- **Sky-gradient cycling** — animate the sky layer through dawn-pink → day-blue → dusk-orange → night-navy the way the kpk pen animates gradient stops, instead of veiling it.
-- **Depth from the pool** — a true reflection of the animated sky and planting in the basin layer.
-- **Parallax, if it is ever wanted back** — `assets/layers/` holds the seven-way cut (see `GARDEN-PLANTS.md` for how it was measured). Each layer needs a wrapper for the cursor offset and an inner element for its ambient drift, because one `transform` cannot carry both; depth runs sky 5 → foreground 42. Amplitude discipline matters: motion under about a pixel a second reads as static however long you watch.
-- **WebGL rebuild** — keep this document's timeline percentages as the choreography spec.
+Wind sway, drifting clouds, and fireflies from this list are now part of the main spec above. Still on the shelf:
+
+- **Sky-gradient cycling:** instead of (or atop) the two veils, animate the hero's sky through dawn-pink → day-blue → dusk-orange → night-navy the way the kpk pen animates SVG gradient stops.
+- **Full WebGL ambient upgrade:** rebuild the scene in Three.js — craftzdog's Ghibli shader for foliage, threex.daynight for the sun cycle, instanced fluffy grass — keeping this document's timeline percentages as the choreography spec.
