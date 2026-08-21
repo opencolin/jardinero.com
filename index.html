@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jardinero — tends your codebase while you're away</title>
-<meta name="description" content="Jardinero is an open-source, always-on AI engineer. It watches your logs, fixes what breaks in disposable sandboxes, takes Linear issues to done, and keeps every PR moving toward merge. From the team at Tenki.">
+<meta name="description" content="Jardinero reads your production logs, reproduces what broke in a clean sandbox, and opens a pull request with the fix. Open source, from the team at Tenki.">
 <meta property="og:title" content="Jardinero — tends your codebase while you're away">
-<meta property="og:description" content="An open-source, always-on AI engineer. It watches your logs, fixes bugs in disposable sandboxes, implements Linear issues, and keeps PRs moving — 24/7.">
+<meta property="og:description" content="It reads your production logs, reproduces what broke in a clean sandbox, and opens a pull request with the fix. Open source, from the team at Tenki.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -170,7 +170,17 @@
      repaints the hero. Kept to a short list — every layer costs memory. */
   .sun,.moon,.cloud,.bfly,.ff{will-change:transform}
   .hero-paused *,.hero-paused{animation-play-state:paused!important}
-  @media (max-width:1023px){.flora{display:none}}
+  @media (max-width:1023px){
+    .plant{width:clamp(132px,21vw,232px)}
+    .plant-l{left:-18px}
+    .plant-r{right:-18px}
+    .plant2,.plant3{display:none}
+  }
+  @media (max-width:660px){
+    .plant{width:clamp(104px,25vw,140px)}
+    .plant-l{left:-14px}
+    .plant-r{right:-14px}
+  }
 
   @media (prefers-reduced-motion: no-preference){
     .sun{animation:sun-cycle 40s linear infinite}
@@ -709,7 +719,7 @@
     <div class="hero-inner">
       <span class="eyebrow"><span class="dot"></span>Open source &middot; from the team at Tenki</span>
       <h1>Jardinero tends your codebase<br>while you&rsquo;re away.</h1>
-      <p class="lede">Jardinero is an always-on AI engineer &mdash; a small factory of machines that watches your logs, fixes what breaks in disposable sandboxes, takes Linear issues to done, and keeps every pull request moving toward&nbsp;merge.</p>
+      <p class="lede">It reads your production logs, reproduces what broke in a clean sandbox, and opens a pull request with the fix. Assign it a Linear issue and it works the same&nbsp;way.</p>
       <span class="pron">/ har&middot;dee&middot;NEH&middot;ro / &mdash; &ldquo;gardener,&rdquo; in Spanish</span>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="https://github.com/LuxorLabs/jardinero">
@@ -1155,7 +1165,7 @@
           </svg>
           <span>LuxorLabs&nbsp;/&nbsp;<b>jardinero</b></span>
         </div>
-        <p>An always-on AI engineer that tends your codebase: log review, issue implementation, and PR maintenance &mdash; in disposable sandboxes.</p>
+        <p>Reads your production logs, reproduces what broke in a clean sandbox, and opens a pull request with the fix. Give it a Linear issue and it works the same way.</p>
         <div class="repo-meta">
           <span>v0.3.0</span><span>open source</span><span>self-hostable</span>
         </div>
