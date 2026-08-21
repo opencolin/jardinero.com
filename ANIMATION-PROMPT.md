@@ -1,5 +1,13 @@
 # Prompt: "A Day in the Garden" — the jardinero.com hero animation
 
+> **Superseded (2026-08-21).** The live hero is now built on a photograph of a
+> formal parterre garden, with dark foreground topiary that grows on top of it.
+> This document describes the fully CSS-drawn scene that preceded it — the sun
+> and moon arc, the three-day meadow, the wild-to-tended day cycle. It is kept
+> because that scene is a complete, working design worth being able to rebuild,
+> and because its timing model (one shared clock, growth in waves, everything
+> synchronised by keyframe percentage) still governs the new hero.
+
 Use this prompt to recreate the animated hero scene from scratch. A reference list of open-source scenes in the same spirit — with licenses — follows the prompt, plus optional flourishes borrowed from them.
 
 ---
