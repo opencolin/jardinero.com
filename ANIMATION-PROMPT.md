@@ -43,25 +43,14 @@ the most detailed and nearest part of the scene.
 Use transparent **WebP**, not PNG — identical alpha, roughly a sixth of the
 weight (700KB for the set against ~4MB). Ship a 960px set for small screens.
 
-## Two independent motions per layer
+## The backdrop is still
 
-Each layer is a wrapper containing an inner element, because two things move it
-and a single `transform` cannot carry both:
-
-- **The wrapper follows the cursor.** JavaScript writes two normalised −1..1
-  values (`--mx`, `--my`) on the hero; each layer multiplies them by its own
-  depth (`--d`: sky 5 → foreground 42). Ease toward the target inside rAF —
-  never with a CSS transition, which would restart on every mouse event — and
-  write once immediately in the handler so the layers still track if rAF is
-  unavailable. Fine pointers only; skip under `prefers-reduced-motion`.
-- **The inner element drifts on its own clock.** Long ease-in-out alternate
-  loops, amplitude and speed both scaling with nearness, so the scene keeps
-  breathing when nobody touches it. Measured travel: 34px on the sky, 67px on
-  the columns, 87px on the lawn, 135px on the foreground border. The pool gets a
-  shimmer — a slight vertical stretch and opacity pulse — instead of a drift.
-
-Amplitude discipline matters more than amount: motion under about a pixel a
-second reads as static no matter how long you watch.
+The photograph does not move. An earlier build cut it into seven parallax
+layers — sky, treeline, columns, lawn, urns, pool, foreground border — each
+drifting on its own clock and following the cursor by depth. The layer assets
+are still in `assets/layers/` and the technique is recorded under "Still on the
+shelf" below, but the live hero uses the single image: with the motion gone the
+split was seven requests and 700KB where one image is 585KB and looks identical.
 
 ## The day
 
@@ -208,4 +197,5 @@ All public CodePen pens are MIT by CodePen's terms of service.
 
 - **Sky-gradient cycling** — animate the sky layer through dawn-pink → day-blue → dusk-orange → night-navy the way the kpk pen animates gradient stops, instead of veiling it.
 - **Depth from the pool** — a true reflection of the animated sky and planting in the basin layer.
+- **Parallax, if it is ever wanted back** — `assets/layers/` holds the seven-way cut (see `GARDEN-PLANTS.md` for how it was measured). Each layer needs a wrapper for the cursor offset and an inner element for its ambient drift, because one `transform` cannot carry both; depth runs sky 5 → foreground 42. Amplitude discipline matters: motion under about a pixel a second reads as static however long you watch.
 - **WebGL rebuild** — keep this document's timeline percentages as the choreography spec.

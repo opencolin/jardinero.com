@@ -77,40 +77,11 @@
   /* ---------- hero ---------- */
   .hero{--hills-h:clamp(150px,21vw,330px);isolation:isolate;position:relative;min-height:100svh;display:flex;flex-direction:column;overflow:hidden;background:#04386f}
   /* the photograph is the backdrop; the animated garden lives in front of it */
-  /* ---------- the photograph, cut into seven parallax layers ----------
-     Each is a transparent WebP carrying only its own part of the scene, so
-     they can drift independently. Amplitude scales with nearness: the sky
-     barely moves, the foreground border moves most. */
-  .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden}
-  /* two nested transforms: the wrapper follows the cursor, the inner element
-     carries the ambient drift, so neither overwrites the other */
-  .pl{position:absolute;inset:0;will-change:transform;
-      transform:translate3d(calc(var(--mx,0) * var(--d) * 1px),calc(var(--my,0) * var(--d) * .45px),0)}
-  .pl>i{position:absolute;inset:-1.5% -7%;display:block;background-size:cover;
-      background-position:center 84%;background-repeat:no-repeat;will-change:transform}
-  .pl-sky{z-index:0;--d:5}
-  .pl-sky>i{background-image:url("assets/layers/sky-960.webp")}
-  .pl-trees{z-index:1;--d:9}
-  .pl-trees>i{background-image:url("assets/layers/trees-960.webp")}
-  .pl-columns{z-index:2;--d:17}
-  .pl-columns>i{background-image:url("assets/layers/columns-960.webp")}
-  .pl-lawn{z-index:3;--d:24}
-  .pl-lawn>i{background-image:url("assets/layers/lawn-960.webp")}
-  .pl-urns{z-index:4;--d:24}
-  .pl-urns>i{background-image:url("assets/layers/urns-960.webp")}
-  .pl-pool{z-index:5;--d:31}
-  .pl-pool>i{background-image:url("assets/layers/pool-960.webp")}
-  .pl-flowers{z-index:6;--d:42}
-  .pl-flowers>i{background-image:url("assets/layers/flowers-960.webp")}
-  @media (min-width:961px){
-    .pl-sky>i{background-image:url("assets/layers/sky.webp")}
-    .pl-trees>i{background-image:url("assets/layers/trees.webp")}
-    .pl-columns>i{background-image:url("assets/layers/columns.webp")}
-    .pl-lawn>i{background-image:url("assets/layers/lawn.webp")}
-    .pl-urns>i{background-image:url("assets/layers/urns.webp")}
-    .pl-pool>i{background-image:url("assets/layers/pool.webp")}
-    .pl-flowers>i{background-image:url("assets/layers/flowers.webp")}
-  }
+  .hero-photo{position:absolute;inset:0;z-index:0;background-size:cover;
+    background-position:center 84%;background-repeat:no-repeat;
+    background-image:url("assets/hero-900.webp")}
+  @media (min-width:901px){ .hero-photo{background-image:url("assets/hero-1280.webp")} }
+  @media (min-width:1281px){ .hero-photo{background-image:url("assets/hero-1920.webp")} }
 
   .hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(2,22,48,.60) 0%,rgba(2,22,48,.30) 30%,rgba(2,22,48,.20) 56%,rgba(2,22,48,.10) 72%,rgba(2,22,48,0) 86%)}
   .hero-inner{flex:1;width:100%;max-width:1000px;margin:0 auto;padding:clamp(56px,9vh,104px) 24px clamp(12px,2vh,28px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;z-index:6}
@@ -203,24 +174,7 @@
 
   @media (prefers-reduced-motion: no-preference){
 
-    /* each layer drifts on its own clock — amplitude and speed both scale with
-       nearness, so the parallax is legible rather than merely present */
-    .pl-sky>i{animation:drift-far 62s ease-in-out infinite alternate}
-    .pl-trees>i{animation:drift-far 52s ease-in-out infinite alternate;animation-delay:-11s}
-    .pl-columns>i{animation:drift-mid 42s ease-in-out infinite alternate;animation-delay:-15s}
-    .pl-lawn>i{animation:drift-mid 36s ease-in-out infinite alternate;animation-delay:-6s}
-    .pl-urns>i{animation:drift-mid 36s ease-in-out infinite alternate;animation-delay:-6s}
-    .pl-pool>i{animation:shimmer 17s ease-in-out infinite alternate}
-    .pl-flowers>i{animation:drift-near 27s ease-in-out infinite alternate;animation-delay:-9s}
 
-    @keyframes drift-far{from{transform:translate3d(-.9%,0,0) scale(1.01)}
-                         to{transform:translate3d(.9%,-.15%,0) scale(1.022)}}
-    @keyframes drift-mid{from{transform:translate3d(-2.4%,.08%,0) scale(1.014)}
-                         to{transform:translate3d(2.4%,-.25%,0) scale(1.032)}}
-    @keyframes drift-near{from{transform:translate3d(-4.6%,.12%,0) scale(1.018) skewX(-.2deg)}
-                          to{transform:translate3d(4.6%,-.3%,0) scale(1.044) skewX(.2deg)}}
-    @keyframes shimmer{from{transform:translate3d(-3%,0,0) scale(1.016,1.004);opacity:.9}
-                       to{transform:translate3d(3%,-.12%,0) scale(1.038,1.022);opacity:1}}
 
     .d2 .rise{animation-name:rise-d2}
     .d3 .rise{animation-name:rise-d3}
@@ -240,8 +194,7 @@
      so dusk darkens planting and photograph together. Palette is sampled
      from the image: near-black cool greens, olive sunlight, warm stone. */
   .bed{position:absolute;top:0;left:-6%;right:-6%;bottom:clamp(60px,9.5%,120px);z-index:3;
-    pointer-events:none;overflow:hidden;--d:42;
-    transform:translate3d(calc(var(--mx,0) * var(--d) * 1px),calc(var(--my,0) * var(--d) * .45px),0)}
+    pointer-events:none;overflow:hidden}
   .topi,.ball,.sunf{position:absolute;bottom:0;transform:translateX(-50%)}
   .topi{width:clamp(52px,6vw,112px)}
   .ball{bottom:1%}
@@ -618,15 +571,7 @@
 
 <main>
   <section class="hero">
-    <div class="hero-photo" aria-hidden="true">
-      <div class="pl pl-sky"><i></i></div>
-      <div class="pl pl-trees"><i></i></div>
-      <div class="pl pl-columns"><i></i></div>
-      <div class="pl pl-lawn"><i></i></div>
-      <div class="pl pl-urns"><i></i></div>
-      <div class="pl pl-pool"><i></i></div>
-      <div class="pl pl-flowers"><i></i></div>
-    </div>
+    <div class="hero-photo" aria-hidden="true"></div>
     <div class="sky" aria-hidden="true">
       <div class="sun"></div>
       <div class="moon"></div>
@@ -1026,36 +971,6 @@
     { rootMargin: '80px' }
   ).observe(hero);
 
-  /* Cursor parallax: writes two normalised -1..1 values that each layer
-     multiplies by its own depth. Eased toward the target in rAF rather than
-     via a CSS transition, so rapid mouse movement does not restart a
-     transition on every event. */
-  if (!matchMedia('(pointer:fine)').matches) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
-  const step = () => {
-    cx += (tx - cx) * 0.09;
-    cy += (ty - cy) * 0.09;
-    write();
-    raf = (Math.abs(tx - cx) > 0.0015 || Math.abs(ty - cy) > 0.0015)
-      ? requestAnimationFrame(step) : 0;
-  };
-  const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
-  const write = () => {
-    hero.style.setProperty('--mx', cx.toFixed(4));
-    hero.style.setProperty('--my', cy.toFixed(4));
-  };
-  hero.addEventListener('mousemove', (e) => {
-    const r = hero.getBoundingClientRect();
-    tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-    ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    // take one step and paint straight away, so the layers still track the
-    // pointer if rAF is unavailable; the loop then eases the rest of the way
-    cx += (tx - cx) * 0.09; cy += (ty - cy) * 0.09;
-    write();
-    kick();
-  }, { passive: true });
-  hero.addEventListener('mouseleave', () => { tx = 0; ty = 0; kick(); }, { passive: true });
 })();
 </script>
 
